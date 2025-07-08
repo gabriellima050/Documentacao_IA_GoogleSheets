@@ -1,0 +1,78 @@
+
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      body { font-family: Arial, sans-serif; margin: 10px; }
+      #chat {
+        border: 1px solid #ccc;
+        padding: 10px;
+        height: 400px;
+        overflow-y: auto;
+        margin-bottom: 10px;
+        white-space: normal;
+      }
+      #inputBox {
+        width: 80%;
+        padding: 8px;
+        font-size: 14px;
+      }
+      #sendBtn {
+        padding: 8px 12px;
+        font-size: 14px;
+      }
+      .user-msg {
+        text-align: right;
+        margin: 5px 0;
+        color: blue;
+        white-space: pre-wrap;
+      }
+      .bot-msg {
+        text-align: left;
+        margin: 5px 0;
+        color: green;
+        white-space: pre-wrap;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="chat"></div>
+    <input type="text" id="inputBox" placeholder="Faça sua pergunta..." />
+    <button id="sendBtn">Enviar</button>
+
+    <script>
+      const chatDiv = document.getElementById('chat');
+      const inputBox = document.getElementById('inputBox');
+      const sendBtn = document.getElementById('sendBtn');
+
+      function addMessage(text, className) {
+        const msgDiv = document.createElement('div');
+        if (className === 'bot-msg') {
+          msgDiv.innerHTML = '<strong>IA:</strong><br>' + text.replace(/\n/g, '<br>');
+        } else {
+          msgDiv.textContent = text;
+        }
+        msgDiv.className = className;
+        chatDiv.appendChild(msgDiv);
+        chatDiv.scrollTop = chatDiv.scrollHeight;
+      }
+
+      sendBtn.onclick = () => {
+        const question = inputBox.value.trim();
+        if (!question) return;
+        addMessage("Você: " + question, 'user-msg');
+        inputBox.value = '';
+        google.script.run.withSuccessHandler(response => {
+          addMessage(response, 'bot-msg');
+        }).consultarIA(question);
+      };
+
+      inputBox.addEventListener("keydown", e => {
+        if (e.key === "Enter") {
+          sendBtn.click();
+        }
+      });
+    </script>
+  </body>
+</html>
